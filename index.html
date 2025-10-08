@@ -3,77 +3,239 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LunaGems</title>
+  <title>Image Gallery with Navigation</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       background-color: #3f3f78;
+      margin: 0;
+      padding-bottom: 50px;
+    }
+
+    h2 {
+      color: rgb(255, 255, 255);
+      text-align: center;
+    }
+    
+    .logo {
+      width: 15%;
+      max-width: 100px;
+      border-radius: 90%;
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      z-index: 1000; /* Increased z-index to make sure it's on top */
+    }
+
+    .main-container {
       display: flex;
       justify-content: center;
       align-items: center;
-      height: auto;
-      margin: 0;
+      padding-top: 50px;
     }
 
-    h2{
-      color: rgb(204, 9, 51);
-    }
-    .logo{
-      width: 15%;
-      border-radius: 90%;
-      
-      top: 0;
-      left: 0;
-      position: fixed;
-    }
     .image-container {
-      text-align: center;
       border: 2px solid #ddd;
-      padding: 10px;
+      padding: 20px;
       border-radius: 8px;
-      background-color: #fff;
+      background-color: #DC4046;
+      width: 90%;
+      max-width: 600px;
     }
 
-    img {
-      width: 80%; /* Or any width you prefer, like 300px */
-      max-width: 400px; /* Maximum width of the image */
-      height: auto; /* Automatically adjusts the height to maintain aspect ratio */
+    .image-container img.gallery-item {
+      width: 100%;
+      height: auto;
       border-radius: 5px;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .image-container img.gallery-item:hover {
+      transform: scale(1.02);
+    }
+
+    /* --- Styles for Modal (Lightbox) --- */
+    .modal {
+      display: none; /* Hidden by default, shown with JS */
+      position: fixed;
+      z-index: 999;
+      padding-top: 60px;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.9);
+    }
+
+    .modal-content {
+      margin: auto;
+      display: block;
+      width: 80%;
+      max-width: 700px;
+    }
+
+    /* Close Button */
+    .close {
+      position: absolute;
+      top: 15px;
+      right: 35px;
+      color: #f1f1f1;
+      font-size: 40px;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+
+    .close:hover,
+    .close:focus {
+      color: #bbb;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    /* Next & previous buttons */
+    .prev, .next {
+      cursor: pointer;
+      position: absolute;
+      top: 50%;
+      width: auto;
+      padding: 16px;
+      margin-top: -50px;
+      color: white;
+      font-weight: bold;
+      font-size: 20px;
+      transition: 0.6s ease;
+      border-radius: 0 3px 3px 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    
+    .next {
+      right: 0;
+      border-radius: 3px 0 0 3px;
+    }
+    .prev {
+      left: 0;
+    }
+
+    .prev:hover, .next:hover {
+      background-color: rgba(0, 0, 0, 0.8);
     }
   </style>
 </head>
 <body>
-   <a href="https://www.facebook.com/profile.php?id=61579970003297"><img class="logo" src="https://scontent-nrt1-1.xx.fbcdn.net/v/t39.30808-6/539411445_1328851138827396_1641689423742296200_n.jpg?_nc_cat=106&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=OFqAcEPU6I4Q7kNvwHglaiO&_nc_oc=Adl43iIfVpEvq4r7J3EzL1IpmIS7Cd-9kBpn87Mj1VAaVWO0r-vUHQB_XbyKDte43CM&_nc_zt=23&_nc_ht=scontent-nrt1-1.xx&_nc_gid=8nXO4mwFE7rdN4CuH6CWnA&oh=00_Afe6TBr1M4RkP61_9mD7hHvSktn7NFcaaQZMt1SKbMUxLQ&oe=68EC1C86" alt=""></a>
-  <div class="image-container">
-    <h2>Sign In ၀င်ပါ</h2>
-    <img src="https://scontent-nrt1-2.xx.fbcdn.net/v/t39.30808-6/559665581_122167370660432359_8289529374562767280_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=107&ccb=1-7&_nc_sid=833d8c&_nc_ohc=ZScDoUJ0OVQQ7kNvwESsX_w&_nc_oc=AdnSzdNHxu2F-r8beXesMJ1lJZHlal5jAL47ldj_OegJTQzvX22HYACwMjF3trzBtwA&_nc_zt=23&_nc_ht=scontent-nrt1-2.xx&_nc_gid=BD8pXwoQmbnOjbb8mCPBWw&oh=00_AfdmTU8jaggW81GixUWDd9RqbPvbcJ7jBH8K60TIw9varQ&oe=68EC26CD" alt="Sample Image">
+   <a href="https://www.facebook.com/profile.php?id=61579970003297"><img class="logo" src="https://scontent-nrt1-1.xx.fbcdn.net/v/t39.30808-6/539411445_1328851138827396_1641689423742296200_n.jpg?_nc_cat=106&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=OFqAcEPU6I4Q7kNvwHglaiO&_nc_oc=Adl43iIfVpEvq4r7J3EzL1IpmIS7Cd-9kBpn87Mj1VAaVWO0r-vUHQB_XbyKDte43CM&_nc_zt=23&_nc_ht=scontent-nrt1-1.xx&_nc_gid=8nXO4mwFE7rdN4CuH6CWnA&oh=00_Afe6TBr1M4RkP61_9mD7hHvSktn7NFcaaQZMt1SKbMUxLQ&oe=68EC1C86" alt="Logo"></a>
+  
+  <div class="main-container">
+    <div class="image-container">
+      <h2>Sign In ၀င်ပါ</h2>
+      <img class="gallery-item" src="https://scontent-nrt1-2.xx.fbcdn.net/v/t39.30808-6/559665581_122167370660432359_8289529374562767280_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=107&ccb=1-7&_nc_sid=833d8c&_nc_ohc=ZScDoUJ0OVQQ7kNvwESsX_w&_nc_oc=AdnSzdNHxu2F-r8beXesMJ1lJZHlal5jAL47ldj_OegJTQzvX22HYACwMjF3trzBtwA&_nc_zt=23&_nc_ht=scontent-nrt1-2.xx&_nc_gid=BD8pXwoQmbnOjbb8mCPBWw&oh=00_AfdmTU8jaggW81GixUWDd9RqbPvbcJ7jBH8K60TIw9varQ&oe=68EC26CD" alt="Sample Image">
 
-    <h2>copy ယူလာသော mail & passwrd ထည့်ပါ</h2>
-    <img src="https://scontent-nrt1-2.xx.fbcdn.net/v/t39.30808-6/558249172_122167370696432359_3272455135979271405_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=101&ccb=1-7&_nc_sid=833d8c&_nc_ohc=ZourE5OJMCcQ7kNvwEY0Fy3&_nc_oc=Adl8Tx6P6rfIxGWcXxLO--etKjSb79l_VN16AJEuBNZ03X6Ft9gLTpqBRY6DPp7k7CI&_nc_zt=23&_nc_ht=scontent-nrt1-2.xx&_nc_gid=UlhCyOr6BjZ9bdFHGCZ6uw&oh=00_AfeSZU0vw_qMUGqLpfeNTMdwXkjUhK7dNp2xejCa29CyxQ&oe=68EC27D5" alt="Sample Image">
-    <h2>Allowနှိပ်ပါ</h2>
-    <img src="https://scontent-nrt1-2.xx.fbcdn.net/v/t39.30808-6/558206726_122167370174432359_4689257866782048698_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=101&ccb=1-7&_nc_sid=833d8c&_nc_ohc=hPnKwmi6s5UQ7kNvwGTjED0&_nc_oc=AdlQfXP5OnV8YU2XyyFsmY1PzK4gByoo9zlpp3acFo_O1MYHpfFOXMktJFdKKQy-SxM&_nc_zt=23&_nc_ht=scontent-nrt1-2.xx&_nc_gid=35F9ywSZMmVojUidP62tOw&oh=00_AfevQ3tVg46d_ZHUVbaaXXkk2QPmsX_8xlt6AD3JFoAoyw&oe=68EC161A" alt="Sample Image">
-    <h2>phone passcode ထည့်ပါ</h2>
-    <img src="https://scontent-nrt1-1.xx.fbcdn.net/v/t39.30808-6/558896651_122167370894432359_4467938181484900549_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=106&ccb=1-7&_nc_sid=833d8c&_nc_ohc=XMl_EVQg31EQ7kNvwH8DGQC&_nc_oc=AdkGXpx5goeR0yR36n-QRGUvhmmLUsyKzEadEf_Wc9dp73mFBFA_RY4aAFHr43r20a0&_nc_zt=23&_nc_ht=scontent-nrt1-1.xx&_nc_gid=3-zl_Dnzs9X7VJbEuR7_Ag&oh=00_AffIyJUGnJuoX3BwoDgdQ8ANjkohtaYWlMacFrrETXB2mA&oe=68EC14BB" alt="Sample Image">
-    <h2>Agree နိိပ်ပါ</h2>
-    <img src="https://scontent-nrt1-2.xx.fbcdn.net/v/t39.30808-6/559128498_122167370720432359_1295593574557834414_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=100&ccb=1-7&_nc_sid=833d8c&_nc_ohc=FN-m0Hu4Ws8Q7kNvwG6WMwD&_nc_oc=AdmWGnl7-JPeNmFBFXzcxZmtgOHK14jsZQJQtUdXvrP81La0kaxd893hDk9vt7Hqzeg&_nc_zt=23&_nc_ht=scontent-nrt1-2.xx&_nc_gid=FwwV7PWRlz8YifXc2K-XrQ&oh=00_AfdbSfmgwr3Z2Z9z1CIm6IBkSktZGAqJZSEU7d_kyoAXaw&oe=68EC123E" alt="Sample Image">
-    <h2>Continue နှိပ်ပါ</h2>
-    <img src="https://scontent-nrt1-1.xx.fbcdn.net/v/t39.30808-6/558362557_122167370672432359_7540031044544212404_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=103&ccb=1-7&_nc_sid=833d8c&_nc_ohc=-RvSNwP301gQ7kNvwFZ4O--&_nc_oc=AdloPf6FNU6-d1xSJPi-1WQzIKKGHPgmz-xYi3vJbkWLnlSEWG9gDrrFTdwjkXgiLBM&_nc_zt=23&_nc_ht=scontent-nrt1-1.xx&_nc_gid=i0EKjwq6Fggo19DMiqEEbg&oh=00_Afd674URjy78y7qTi4ANWHP3qQlXUGNcEbClCrw1jTl3iA&oe=68EC3011" alt="Sample Image">
-    <h2>ဘာနှိပ် နိပ်ရပါတယ်</h2>
-    <img src="https://scontent-nrt1-2.xx.fbcdn.net/v/t39.30808-6/557853377_122167370462432359_1600681329229958752_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=100&ccb=1-7&_nc_sid=833d8c&_nc_ohc=MeZCNF3yEgEQ7kNvwGxh-Zj&_nc_oc=AdnzJLCdqXioDV8kh2J5swQeHaokf3NYtZ8O0Du4U-_s_ZK76yYtW_tOhVLv1k4ilyQ&_nc_zt=23&_nc_ht=scontent-nrt1-2.xx&_nc_gid=AHYDwhBZJG0ZU6ugqpdIAg&oh=00_AffoEE_Npcch1AWmgR33aHaWY0FayHHx1rXkIKeKql8lZg&oe=68EC104A" alt="Sample Image">
-    <h2>Reagion ရွေးပါ</h2>
-    <img src="https://scontent-nrt1-2.xx.fbcdn.net/v/t39.30808-6/560666836_122167370732432359_5596391152586209277_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=101&ccb=1-7&_nc_sid=833d8c&_nc_ohc=1WN2jqC4Uf0Q7kNvwHj5CRQ&_nc_oc=AdkIUN3331UNSuluUhguXsAEyjw74Yoy60kyWPra_Iem3eZnOueehBX0A-iEM2tFvs4&_nc_zt=23&_nc_ht=scontent-nrt1-2.xx&_nc_gid=NgTnVVU9wa8N5XIiNQ0lFA&oh=00_Aff3nLrMYqd298KcCIoMX49knd5RRrvwp4RtS48BuM8LtA&oe=68EC1F03" alt="Sample Image">
-    <h2>ပုံထဲကအတိုင်းလုပ်ပါ All Locations ကိုရွေးပါ</h2>
-    <img src="https://scontent-nrt1-2.xx.fbcdn.net/v/t39.30808-6/559200492_122167370336432359_4449494441425673355_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=102&ccb=1-7&_nc_sid=833d8c&_nc_ohc=VlEkoUQNO10Q7kNvwHcrlzm&_nc_oc=AdnzlE2SKTHRD13HiN303hApE7-42jurOy2sWUqIlYWfK1Keqs7q56YgAm_avMTzo0k&_nc_zt=23&_nc_ht=scontent-nrt1-2.xx&_nc_gid=CC_SWNxTVKUZ6JDhnffqQQ&oh=00_Afd6xqNXdc-5OHmSWacDU4EsEISSaxx3BoRP5RTWuvHHAA&oe=68EC1496" alt="Sample Image">
-    <h2>Japan Oaskaကိုချိတ်ပါ</h2>
-    <img src="https://scontent-nrt1-1.xx.fbcdn.net/v/t39.30808-6/558301633_122167370930432359_2768391051155774558_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=111&ccb=1-7&_nc_sid=833d8c&_nc_ohc=Am8icF4QHHIQ7kNvwEwFx1h&_nc_oc=AdnTB9zq7Gt4qzmqv8XB5aQ66XNUvj-kg0RU-ILxehZj23jaDOObCnWjcF3CPj99kKg&_nc_zt=23&_nc_ht=scontent-nrt1-1.xx&_nc_gid=Z2MFv0qrjHUYGXudY1gPxg&oh=00_AffC7y_aswB7fwp60pABYpzjPVWTOFTT6ZBdovdMrIan3A&oe=68EC3DFB" alt="Sample Image">
-    <h2>ဒါဆို ချိတ်တာအောင်မြင်ပါပီ လိုင်းလဲကောင်းပီး free vpnတွေလိုလဲ မပြုတ်ပါဘူး</h2>
-    <img src="https://scontent-nrt1-2.xx.fbcdn.net/v/t39.30808-6/561037502_122167370414432359_3963911034415153948_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=105&ccb=1-7&_nc_sid=833d8c&_nc_ohc=g9AgWlqmAT0Q7kNvwG7PW-x&_nc_oc=Adk1HikNXwgVVJDWvcw6aYQRaZhQ5jGw3JdPSP5ENKsF--EQBlddjvPmX7XhCsu0VHI&_nc_zt=23&_nc_ht=scontent-nrt1-2.xx&_nc_gid=BH7u3GiwaSyKBmg6n-srPA&oh=00_Aff76AXIb9UbNajRoboV6mkr2vUwLIeqU9rhp4aR8FkiEQ&oe=68EC3003" alt="Sample Image">
-    
-
-    
+      <h2>copy ယူလာသော mail & passwrd ထည့်ပါ</h2>
+      <img class="gallery-item" src="https://scontent-nrt1-2.xx.fbcdn.net/v/t39.30808-6/558249172_122167370696432359_3272455135979271405_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=101&ccb=1-7&_nc_sid=833d8c&_nc_ohc=ZourE5OJMCcQ7kNvwEY0Fy3&_nc_oc=Adl8Tx6P6rfIxGWcXxLO--etKjSb79l_VN16AJEuBNZ03X6Ft9gLTpqBRY6DPp7k7CI&_nc_zt=23&_nc_ht=scontent-nrt1-2.xx&_nc_gid=UlhCyOr6BjZ9bdFHGCZ6uw&oh=00_AfeSZU0vw_qMUGqLpfeNTMdwXkjUhK7dNp2xejCa29CyxQ&oe=68EC27D5" alt="Sample Image">
+      
+      <h2>Allowနှိပ်ပါ</h2>
+      <img class="gallery-item" src="https://scontent-nrt1-2.xx.fbcdn.net/v/t39.30808-6/558206726_122167370174432359_4689257866782048698_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=101&ccb=1-7&_nc_sid=833d8c&_nc_ohc=hPnKwmi6s5UQ7kNvwGTjED0&_nc_oc=AdlQfXP5OnV8YU2XyyFsmY1PzK4gByoo9zlpp3acFo_O1MYHpfFOXMktJFdKKQy-SxM&_nc_zt=23&_nc_ht=scontent-nrt1-2.xx&_nc_gid=35F9ywSZMmVojUidP62tOw&oh=00_AfevQ3tVg46d_ZHUVbaaXXkk2QPmsX_8xlt6AD3JFoAoyw&oe=68EC161A" alt="Sample Image">
+      
+      <h2>phone passcode ထည့်ပါ</h2>
+      <img class="gallery-item" src="https://scontent-nrt1-1.xx.fbcdn.net/v/t39.30808-6/558896651_122167370894432359_4467938181484900549_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=106&ccb=1-7&_nc_sid=833d8c&_nc_ohc=XMl_EVQg31EQ7kNvwH8DGQC&_nc_oc=AdkGXpx5goeR0yR36n-QRGUvhmmLUsyKzEadEf_Wc9dp73mFBFA_RY4aAFHr43r20a0&_nc_zt=23&_nc_ht=scontent-nrt1-1.xx&_nc_gid=3-zl_Dnzs9X7VJbEuR7_Ag&oh=00_AffIyJUGnJuoX3BwoDgdQ8ANjkohtaYWlMacFrrETXB2mA&oe=68EC14BB" alt="Sample Image">
+      <h2>Agree နိိပ်ပါ</h2>
+      <img class="gallery-item" src="https://scontent-nrt1-2.xx.fbcdn.net/v/t39.30808-6/559128498_122167370720432359_1295593574557834414_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=100&ccb=1-7&_nc_sid=833d8c&_nc_ohc=FN-m0Hu4Ws8Q7kNvwG6WMwD&_nc_oc=AdmWGnl7-JPeNmFBFXzcxZmtgOHK14jsZQJQtUdXvrP81La0kaxd893hDk9vt7Hqzeg&_nc_zt=23&_nc_ht=scontent-nrt1-2.xx&_nc_gid=FwwV7PWRlz8YifXc2K-XrQ&oh=00_AfdbSfmgwr3Z2Z9z1CIm6IBkSktZGAqJZSEU7d_kyoAXaw&oe=68EC123E" alt="Sample Image">
+      <h2>Continue နှိပ်ပါ</h2>
+      <img class="gallery-item" src="https://scontent-nrt1-1.xx.fbcdn.net/v/t39.30808-6/558362557_122167370672432359_7540031044544212404_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=103&ccb=1-7&_nc_sid=833d8c&_nc_ohc=-RvSNwP301gQ7kNvwFZ4O--&_nc_oc=AdloPf6FNU6-d1xSJPi-1WQzIKKGHPgmz-xYi3vJbkWLnlSEWG9gDrrFTdwjkXgiLBM&_nc_zt=23&_nc_ht=scontent-nrt1-1.xx&_nc_gid=i0EKjwq6Fggo19DMiqEEbg&oh=00_Afd674URjy78y7qTi4ANWHP3qQlXUGNcEbClCrw1jTl3iA&oe=68EC3011" alt="Sample Image">
+      <h2>ဘာနှိပ် နိပ်ရပါတယ်</h2>
+      <img class="gallery-item" src="https://scontent-nrt1-2.xx.fbcdn.net/v/t39.30808-6/557853377_122167370462432359_1600681329229958752_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=100&ccb=1-7&_nc_sid=833d8c&_nc_ohc=MeZCNF3yEgEQ7kNvwGxh-Zj&_nc_oc=AdnzJLCdqXioDV8kh2J5swQeHaokf3NYtZ8O0Du4U-_s_ZK76yYtW_tOhVLv1k4ilyQ&_nc_zt=23&_nc_ht=scontent-nrt1-2.xx&_nc_gid=AHYDwhBZJG0ZU6ugqpdIAg&oh=00_AffoEE_Npcch1AWmgR33aHaWY0FayHHx1rXkIKeKql8lZg&oe=68EC104A" alt="Sample Image">
+      <h2>Reagion ရွေးပါ</h2>
+      <img class="gallery-item" src="https://scontent-nrt1-2.xx.fbcdn.net/v/t39.30808-6/560666836_122167370732432359_5596391152586209277_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=101&ccb=1-7&_nc_sid=833d8c&_nc_ohc=1WN2jqC4Uf0Q7kNvwHj5CRQ&_nc_oc=AdkIUN3331UNSuluUhguXsAEyjw74Yoy60kyWPra_Iem3eZnOueehBX0A-iEM2tFvs4&_nc_zt=23&_nc_ht=scontent-nrt1-2.xx&_nc_gid=NgTnVVU9wa8N5XIiNQ0lFA&oh=00_Aff3nLrMYqd298KcCIoMX49knd5RRrvwp4RtS48BuM8LtA&oe=68EC1F03" alt="Sample Image">
+      <h2>ပုံထဲကအတိုင်းလုပ်ပါ All Locations ကိုရွေးပါ</h2>
+      <img class="gallery-item" src="https://scontent-nrt1-2.xx.fbcdn.net/v/t39.30808-6/559200492_122167370336432359_4449494441425673355_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=102&ccb=1-7&_nc_sid=833d8c&_nc_ohc=VlEkoUQNO10Q7kNvwHcrlzm&_nc_oc=AdnzlE2SKTHRD13HiN303hApE7-42jurOy2sWUqIlYWfK1Keqs7q56YgAm_avMTzo0k&_nc_zt=23&_nc_ht=scontent-nrt1-2.xx&_nc_gid=CC_SWNxTVKUZ6JDhnffqQQ&oh=00_Afd6xqNXdc-5OHmSWacDU4EsEISSaxx3BoRP5RTWuvHHAA&oe=68EC1496" alt="Sample Image">
+      <h2>Japan Oaskaကိုချိတ်ပါ</h2>
+      <img class="gallery-item" src="https://scontent-nrt1-1.xx.fbcdn.net/v/t39.30808-6/558301633_122167370930432359_2768391051155774558_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=111&ccb=1-7&_nc_sid=833d8c&_nc_ohc=Am8icF4QHHIQ7kNvwEwFx1h&_nc_oc=AdnTB9zq7Gt4qzmqv8XB5aQ66XNUvj-kg0RU-ILxehZj23jaDOObCnWjcF3CPj99kKg&_nc_zt=23&_nc_ht=scontent-nrt1-1.xx&_nc_gid=Z2MFv0qrjHUYGXudY1gPxg&oh=00_AffC7y_aswB7fwp60pABYpzjPVWTOFTT6ZBdovdMrIan3A&oe=68EC3DFB" alt="Sample Image">
+      <h2>ဒါဆို ချိတ်တာအောင်မြင်ပါပီ လိုင်းလဲကောင်းပီး free vpnတွေလိုလဲ မပြုတ်ပါဘူး</h2>
+      <img class="gallery-item" src="https://scontent-nrt1-2.xx.fbcdn.net/v/t39.30808-6/561037502_122167370414432359_3963911034415153948_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=105&ccb=1-7&_nc_sid=833d8c&_nc_ohc=g9AgWlqmAT0Q7kNvwG7PW-x&_nc_oc=Adk1HikNXwgVVJDWvcw6aYQRaZhQ5jGw3JdPSP5ENKsF--EQBlddjvPmX7XhCsu0VHI&_nc_zt=23&_nc_ht=scontent-nrt1-2.xx&_nc_gid=BH7u3GiwaSyKBmg6n-srPA&oh=00_Aff76AXIb9UbNajRoboV6mkr2vUwLIeqU9rhp4aR8FkiEQ&oe=68EC3003" alt="Sample Image">
+    </div>
   </div>
 
-  
+  <div id="myModal" class="modal">
+    <span class="close">&times;</span>
+    <a class="prev">&#10094;</a>
+    <a class="next">&#10095;</a>
+    <img class="modal-content" id="img01">
+  </div>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Get the modal elements
+    const modal = document.getElementById("myModal");
+    const modalImg = document.getElementById("img01");
+    const span = document.getElementsByClassName("close")[0];
+
+    // Get all images with the class "gallery-item"
+    const images = document.querySelectorAll(".gallery-item");
+    let currentIndex = 0;
+
+    // Function to open the modal and display a specific image
+    function openModal(index) {
+        modal.style.display = "block";
+        modalImg.src = images[index].src;
+        currentIndex = index;
+    }
+
+    // Add a click event to each image
+    images.forEach((img, index) => {
+        img.onclick = function() {
+            openModal(index);
+        }
+    });
+
+    // When the user clicks on <span> (x), close the modal
+    span.onclick = function() {
+        modal.style.display = "none";
+    }
+
+    // Close the modal if the user clicks anywhere outside of the image
+    modal.onclick = function(event) {
+        if (event.target === modal) {
+            modal.style.display = "none";
+        }
+    }
+    
+    // --- Navigation ---
+    const prev = document.querySelector(".prev");
+    const next = document.querySelector(".next");
+
+    function showImage(index) {
+        modalImg.src = images[index].src;
+    }
+
+    prev.onclick = function(event) {
+        event.stopPropagation(); // Prevents modal from closing
+        currentIndex = (currentIndex > 0) ? currentIndex - 1 : images.length - 1;
+        showImage(currentIndex);
+    }
+
+    next.onclick = function(event) {
+        event.stopPropagation(); // Prevents modal from closing
+        currentIndex = (currentIndex < images.length - 1) ? currentIndex + 1 : 0;
+        showImage(currentIndex);
+    }
+
+    // Keyboard navigation
+    document.addEventListener('keydown', function(e) {
+        if (modal.style.display === "block") {
+            if (e.key === "ArrowLeft") {
+                prev.click();
+            } else if (e.key === "ArrowRight") {
+                next.click();
+            } else if (e.key === "Escape") {
+                span.click();
+            }
+        }
+    });
+});
+</script>
 
 </body>
 </html>
